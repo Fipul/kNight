@@ -48,3 +48,11 @@ var _ = Describe("AvaliableMoves", func() {
 		})
 	})
 })
+
+var _ = Describe("DecodePoint", func() {
+	Context("если point не верный", func() {
+		It("ожидается [0 0]", func() {
+			Expect(DecodePoint("")).To(Equal([2]int{0, 0}))
+		})
+	})
+})

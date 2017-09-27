@@ -1,32 +1,80 @@
 package knight
 
-//import "fmt"
-func AvaliableMoves(point string) []string {
-	var result []string
+import (
+	"errors"
+	"strconv"
+)
 
-	/*switch point {
-	case "a*":
-		x = 1
-	case "b*":
-		x = 2
-	case "c*":
-		x = 3
-	case "d*":
-		x = 4
-	case "e*":
-		x = 5
-	case "f*":
-		x = 6
-	case "g*":
-		x = 7
-	case "h*":
-		x = 8
+func AvaliableMoves(point string) ([]string, error) {
+	var result []string
+	decodedpoint, err := DecodePoint(point)
+	if err != nil {
+		return nil, errors.New("can't decode point: " + err.Error())
 	}
 
-		var y int
-		if _, err := fmt.Sscan(point, &y); err == nil {
-
+	for i := 0; i < 8; i++ {
+		encodedpoint, err := EncodePoint(decodedpoint)
+		if err != nil {
+			return nil, errors.New("Can't encode point" + err.Error())
 		}
-	*/
-	return result
+		result[i] = encodedpoint
+	}
+	return result, nil
+}
+
+func DecodePoint(point string) ([2]int, error) {
+	var result [2]int
+	var err error
+	if len(point) != 2 {
+		return result, errors.New("len != 2")
+	}
+	switch point[0:1] {
+	case "a":
+		result[0] = 1
+	case "b":
+		result[0] = 2
+	case "c":
+		result[0] = 3
+	case "d":
+		result[0] = 4
+	case "e":
+		result[0] = 5
+	case "f":
+		result[0] = 6
+	case "g":
+		result[0] = 7
+	case "h":
+		result[0] = 8
+	}
+	result[1], err = strconv.Atoi(point[1:])
+	if err != nil {
+		return result, errors.New("can't Atoi" + err.Error())
+	}
+	return result, nil
+}
+
+func EncodePoint(point [2]int) (string, error) {
+	var result string
+	slice := result[0:1]
+	switch point[0] {
+	case 1:
+		slice = "a"
+	case 2:
+		slice = "b"
+	case 3:
+		slice = "c"
+	case 4:
+		slice = "d"
+	case 5:
+		slice = "e"
+	case 6:
+		slice = "f"
+	case 7:
+		slice = "g"
+	case 8:
+		slice = "h"
+	}
+	result = slice
+	result += strconv.Itoa(point[1])
+	return result, nil
 }
