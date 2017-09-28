@@ -2,79 +2,30 @@ package knight
 
 import (
 	"errors"
+	"sort"
 	"strconv"
 )
 
-func AvailableMoves(point string) ([8]string, error) {
-	var result [8]string
-	var err error
-	x := 0
-	decodedPoint, err := DecodePoint(point)
-
+func AvailableMoves(point string) ([]string, error) {
+	var result []string
+	p, err := DecodePoint(point)
 	if err != nil {
 		return result, errors.New("can't decode point: " + err.Error())
 	}
-	if decodedPoint[0] < 1 || decodedPoint[0] > 8 || decodedPoint[1] < 1 || decodedPoint[1] > 8 {
-		return result, err
-	}
-
-	if decodedPoint[1]-1 > 0 && decodedPoint[0]-2 > 0 {
-		result[x], err = EncodePoint([2]int{decodedPoint[0] - 2, decodedPoint[1] - 1})
-		if err != nil {
-			return result, errors.New("can't encode")
+	moves2, moves1 := []int{+2, -2}, []int{+1, -1}
+	for _, m2 := range moves2 {
+		for _, m1 := range moves1 {
+			rp, err := EncodePoint([2]int{p[0] + m1, p[1] + m2})
+			if err == nil {
+				result = append(result, rp)
+			}
+			rp, err = EncodePoint([2]int{p[0] + m2, p[1] + m1})
+			if err == nil {
+				result = append(result, rp)
+			}
 		}
-		x++
 	}
-	if decodedPoint[1]+1 < 9 && decodedPoint[0]-2 > 0 {
-		result[x], err = EncodePoint([2]int{decodedPoint[0] - 2, decodedPoint[1] + 1})
-		if err != nil {
-			return result, errors.New("can't encode")
-		}
-		x++
-	}
-	if decodedPoint[0]-1 > 0 && decodedPoint[1]-2 > 0 {
-		result[x], err = EncodePoint([2]int{decodedPoint[0] - 1, decodedPoint[1] - 2})
-		if err != nil {
-			return result, errors.New("can't encode")
-		}
-		x++
-	}
-	if decodedPoint[0]-1 > 0 && decodedPoint[1]+2 < 9 {
-		result[x], err = EncodePoint([2]int{decodedPoint[0] - 1, decodedPoint[1] + 2})
-		if err != nil {
-			return result, errors.New("can't encode")
-		}
-		x++
-	}
-	if decodedPoint[0]+1 < 9 && decodedPoint[1]-2 > 0 {
-		result[x], err = EncodePoint([2]int{decodedPoint[0] + 1, decodedPoint[1] - 2})
-		if err != nil {
-			return result, errors.New("can't encode")
-		}
-		x++
-	}
-	if decodedPoint[0]+1 < 9 && decodedPoint[1]+2 < 9 {
-		result[x], err = EncodePoint([2]int{decodedPoint[0] + 1, decodedPoint[1] + 2})
-		if err != nil {
-			return result, errors.New("can't encode")
-		}
-		x++
-	}
-	if decodedPoint[1]-1 > 0 && decodedPoint[0]+2 < 9 {
-		result[x], err = EncodePoint([2]int{decodedPoint[0] + 2, decodedPoint[1] - 1})
-		if err != nil {
-			return result, errors.New("can't encode")
-		}
-		x++
-	}
-	if decodedPoint[1]+1 < 9 && decodedPoint[0]+2 < 9 {
-		result[x], err = EncodePoint([2]int{decodedPoint[0] + 2, decodedPoint[1] + 1})
-		if err != nil {
-			return result, errors.New("can't encode")
-		}
-		x++
-	}
-
+	sort.Strings(result)
 	return result, nil
 }
 
@@ -104,10 +55,12 @@ func DecodePoint(point string) ([2]int, error) {
 	default:
 		return result, errors.New("wrong point[0]")
 	}
-
 	result[1], err = strconv.Atoi(point[1:])
 	if err != nil {
 		return result, errors.New("wrong point[1]: can't Atoi: " + err.Error())
+	}
+	if result[1] < 1 || result[1] > 8 {
+		return result, errors.New("wrong point[1]")
 	}
 	return result, nil
 }
