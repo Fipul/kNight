@@ -5,20 +5,76 @@ import (
 	"strconv"
 )
 
-func AvaliableMoves(point string) ([]string, error) {
-	var result []string
-	decodedpoint, err := DecodePoint(point)
+func AvailableMoves(point string) ([8]string, error) {
+	var result [8]string
+	var err error
+	x := 0
+	decodedPoint, err := DecodePoint(point)
+
 	if err != nil {
-		return nil, errors.New("can't decode point: " + err.Error())
+		return result, errors.New("can't decode point: " + err.Error())
+	}
+	if decodedPoint[0] < 1 || decodedPoint[0] > 8 || decodedPoint[1] < 1 || decodedPoint[1] > 8 {
+		return result, err
 	}
 
-	for i := 0; i < 8; i++ {
-		encodedpoint, err := EncodePoint(decodedpoint)
+	if decodedPoint[1]-1 > 0 && decodedPoint[0]-2 > 0 {
+		result[x], err = EncodePoint([2]int{decodedPoint[0] - 2, decodedPoint[1] - 1})
 		if err != nil {
-			return nil, errors.New("Can't encode point" + err.Error())
+			return result, errors.New("can't encode")
 		}
-		result[i] = encodedpoint
+		x++
 	}
+	if decodedPoint[1]+1 < 9 && decodedPoint[0]-2 > 0 {
+		result[x], err = EncodePoint([2]int{decodedPoint[0] - 2, decodedPoint[1] + 1})
+		if err != nil {
+			return result, errors.New("can't encode")
+		}
+		x++
+	}
+	if decodedPoint[0]-1 > 0 && decodedPoint[1]-2 > 0 {
+		result[x], err = EncodePoint([2]int{decodedPoint[0] - 1, decodedPoint[1] - 2})
+		if err != nil {
+			return result, errors.New("can't encode")
+		}
+		x++
+	}
+	if decodedPoint[0]-1 > 0 && decodedPoint[1]+2 < 9 {
+		result[x], err = EncodePoint([2]int{decodedPoint[0] - 1, decodedPoint[1] + 2})
+		if err != nil {
+			return result, errors.New("can't encode")
+		}
+		x++
+	}
+	if decodedPoint[0]+1 < 9 && decodedPoint[1]-2 > 0 {
+		result[x], err = EncodePoint([2]int{decodedPoint[0] + 1, decodedPoint[1] - 2})
+		if err != nil {
+			return result, errors.New("can't encode")
+		}
+		x++
+	}
+	if decodedPoint[0]+1 < 9 && decodedPoint[1]+2 < 9 {
+		result[x], err = EncodePoint([2]int{decodedPoint[0] + 1, decodedPoint[1] + 2})
+		if err != nil {
+			return result, errors.New("can't encode")
+		}
+		x++
+	}
+	if decodedPoint[1]-1 > 0 && decodedPoint[0]+2 < 9 {
+		result[x], err = EncodePoint([2]int{decodedPoint[0] + 2, decodedPoint[1] - 1})
+		if err != nil {
+			return result, errors.New("can't encode")
+		}
+		x++
+	}
+	if decodedPoint[1]+1 < 9 && decodedPoint[0]+2 < 9 {
+		result[x], err = EncodePoint([2]int{decodedPoint[0] + 2, decodedPoint[1] + 1})
+		if err != nil {
+			return result, errors.New("can't encode")
+		}
+		x++
+	}
+
 	return result, nil
 }
 
@@ -45,36 +101,40 @@ func DecodePoint(point string) ([2]int, error) {
 		result[0] = 7
 	case "h":
 		result[0] = 8
+	default:
+		return result, errors.New("wrong point[0]")
 	}
+
 	result[1], err = strconv.Atoi(point[1:])
 	if err != nil {
-		return result, errors.New("can't Atoi" + err.Error())
+		return result, errors.New("wrong point[1]: can't Atoi: " + err.Error())
 	}
 	return result, nil
 }
 
 func EncodePoint(point [2]int) (string, error) {
 	var result string
-	slice := result[0:1]
+	if point[0] < 1 || point[0] > 8 || point[1] < 1 || point[1] > 8 {
+		return result, errors.New("wrong point")
+	}
 	switch point[0] {
 	case 1:
-		slice = "a"
+		result = "a"
 	case 2:
-		slice = "b"
+		result = "b"
 	case 3:
-		slice = "c"
+		result = "c"
 	case 4:
-		slice = "d"
+		result = "d"
 	case 5:
-		slice = "e"
+		result = "e"
 	case 6:
-		slice = "f"
+		result = "f"
 	case 7:
-		slice = "g"
+		result = "g"
 	case 8:
-		slice = "h"
+		result = "h"
 	}
-	result = slice
 	result += strconv.Itoa(point[1])
 	return result, nil
 }
